@@ -9,7 +9,7 @@ import logo from '../../assets/logo.png'
 const LeftHeading = () => {
   return (
     <>
-     <div className="left w-[35%] h-[100vh] flex flex-col justify-center ">
+     <div className="left w-full lg:w-[35%] h-[100vh] flex flex-col justify-center ">
                <Image className='w-[50%]' src={logo} alt="" /> 
                <h2 className='font-semibold mb-5'>Your satisfiction form</h2>
                <h2 className='font-bold text-3xl mb-5'>Please Take <span className='text-purple-950'>Survey</span> </h2>
