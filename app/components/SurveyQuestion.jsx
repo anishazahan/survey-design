@@ -3,48 +3,21 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-
-const options_1 = [
-  { id: 'option1', label: 'Strongly Agree' },
-  { id: 'option2', label: 'Agree' },
-  { id: 'option3', label: 'Disagree' },
-  { id: 'option4', label: 'Strongly Disagree' }
-];
-const options_2 = [
-  { id: 'option1', label: 'Strongly Agree' },
-  { id: 'option2', label: 'Agree' },
-  { id: 'option3', label: 'Disagree' },
-  { id: 'option4', label: 'Strongly Disagree' }
-];
-const options_3 = [
-  { id: 'option1', label: 'Strongly Agree' },
-  { id: 'option2', label: 'Agree' },
-  { id: 'option3', label: 'Disagree' },
-  { id: 'option4', label: 'Strongly Disagree' }
-];
-const options_4 = [
-  { id: 'option1', label: 'Yes,always' },
-  { id: 'option2', label: 'Yes,most of the time' },
-  { id: 'option3', label: 'Sometimes' },
-  { id: 'option4', label: 'Rarely' },
-  { id: 'option5', label: 'No,never' }
-];
-const options_5 = [
-  { id: 'option1', label: 'Excellent' },
-  { id: 'option2', label: 'Good' },
-  { id: 'option3', label: 'Average' },
-  { id: 'option4', label: 'Fair' },
-  { id: 'option5', label: 'Poor' },
-];
+import { data } from './data.js';
+import { AiFillStar } from 'react-icons/ai';
+import NextQuestion from './NextQuestion.jsx';
 
 const SurveyQuestion = () => {
-
   const [selectedOptions, setSelectedOptions] = useState({});
+  const [currentData, setCurrentData] = useState(data.slice(0, 3));
+  const [currentDataIndex, setCurrentDataIndex] = useState(0);
+  const [isSubmitVisible, setIsSubmitVisible] = useState(false);
+
 
   const handleOptionChange = (questionId, optionId) => {
     setSelectedOptions((prevSelectedOptions) => ({
       ...prevSelectedOptions,
-      [questionId]: optionId
+      [questionId]: optionId,
     }));
   };
 
@@ -62,7 +35,7 @@ const SurveyQuestion = () => {
   const OptionList = ({ options, questionId, selectedOption, handleOptionChange }) => {
     return options.map((option) => (
       <div
-        className={`${selectedOption === option.id && 'bg-purple-500'} flex items-center border-b border-gray-300 py-2 hover:bg-purple-400 pl-[5%]`}
+        className={`${selectedOption === option.id && 'bg-purple-300'} flex items-center border-b border-gray-300 py-2 hover:bg-purple-300 pl-[4%] max-w-md`}
         key={option.id}
       >
         <input
@@ -81,70 +54,92 @@ const SurveyQuestion = () => {
     ));
   };
 
+  const handleNext = () => {
+    const nextIndex = currentDataIndex + 3;
+    setCurrentDataIndex(nextIndex);
+    setCurrentData(data.slice(nextIndex, nextIndex + 3));
+
+    if (nextIndex === 3) {
+      setIsSubmitVisible(true);
+    }
+  };
+
+  const handlePrev = () => {
+    const prevIndex = currentDataIndex - 3;
+    setCurrentDataIndex(prevIndex);
+    setCurrentData(data.slice(prevIndex, prevIndex + 3));
+
+    if (prevIndex !== 0) {
+      setIsSubmitVisible(false);
+    }
+  };
+
+
   return (
-    <div>
+    <div className="pl-[7%] pt-[10%]">
       <form>
-        {/* Question 1 */}
-        <h2 className="font-semibold text-zinc-800 mb-3">
-          1. Overall I am satisfied with the services provided by Axons Homecare?
-        </h2>
-        <OptionList
-          options={options_1}
-          questionId="question1"
-          selectedOption={selectedOptions['question1']}
-          handleOptionChange={handleOptionChange}
-        />
+        {currentData.map((questionData, index) => (
+          <div className="mb-5" key={questionData.id}>
+            <h2 className="font-semibold text-zinc-800 mb-1 max-w-xl">
+              {`${currentDataIndex + index + 1}. ${questionData.question}`}
+            </h2>
+            <OptionList
+              options={questionData.label.map((label, index) => ({
+                id: `option${index + 1}`,
+                label,
+              }))}
+              questionId={`question${questionData.id}`}
+              selectedOption={selectedOptions[`question${questionData.id}`]}
+              handleOptionChange={handleOptionChange}
+            />
+          </div>
+        ))}
 
-        {/* Question 2 */}
-        <h2 className="font-semibold text-zinc-800 mb-3 mt-7">
-          2. I would recommend Axons Homecare to a family member and friend?
-        </h2>
-        <OptionList
-          options={options_2}
-          questionId="question2"
-          selectedOption={selectedOptions['question2']}
-          handleOptionChange={handleOptionChange}
-        />
+        {currentDataIndex === 3 && (
+          <>
+           <NextQuestion></NextQuestion>
+            <div className="flex justify-end pr-5 mt-14 mb-14 items-center space-x-7">
+              {currentDataIndex > 0 && (
+                <button className="bg-purple-800 py-1 px-8 font-semibold text-white" onClick={handlePrev}>
+                   <span>Prev</span>
+                </button>
+              )}
+              {isSubmitVisible ? (
+                <button className="bg-purple-800 py-1 px-8 font-semibold text-white">
+                 <span>  Submit</span>
+                </button>
+              ) : (
+                <button className="bg-purple-800 py-1 px-8 font-semibold text-white" onClick={handleNext}>
+                  <span>Next</span>
+                </button>
+              )}
+            </div>
+          </>
+        )}
 
-        {/* Question 3 */}
-        <h2 className="font-semibold text-zinc-800 mb-3 mt-7">
-          3. Did the homecare staff effectively communicate with you about care plan, treatment, and any changes to your condition?
-        </h2>
-        <OptionList
-          options={options_3}
-          questionId="question3"
-          selectedOption={selectedOptions['question3']}
-          handleOptionChange={handleOptionChange}
-        />
-
-        {/* Question 4 */}
-        <h2 className="font-semibold text-zinc-800 mb-3 mt-7">
-          4. What your privacy and confidentially respected by the Homecare staff?
-        </h2>
-        <OptionList
-          options={options_4}
-          questionId="question4"
-          selectedOption={selectedOptions['question4']}
-          handleOptionChange={handleOptionChange}
-        />
-
-        {/* Question 5 */}
-        <h2 className="font-semibold text-zinc-800 mb-3 mt-7">
-          5. How would you rate the quality of the care provided by the Homecare staff?
-        </h2>
-        <OptionList
-          options={options_5}
-          questionId="question5"
-          selectedOption={selectedOptions['question5']}
-          handleOptionChange={handleOptionChange}
-        />
-
-        <div className="flex justify-end pr-2 mt-8">
-          <Link href={'/survey/nextPage'} className='bg-purple-800 py-3 px-8 font-semibold text-white'>Next</Link>
-        </div>
+        {currentDataIndex !== 3 && (
+          <div className="flex justify-end pr-5 mt-14 mb-14 items-center space-x-7">
+          
+        
+            {currentDataIndex > 0 && (
+              <button className="bg-purple-800 py-1 px-8 font-semibold text-white" onClick={handlePrev}>
+                <span>Prev</span>
+              </button>
+            )}
+            {currentDataIndex + 3 < data.length && (
+              <button className="bg-purple-800 py-1 px-8 font-semibold text-white" onClick={handleNext}>
+               <span> Next</span>
+              </button>
+            )}
+          </div>
+        )}
       </form>
     </div>
   );
 };
 
 export default SurveyQuestion;
+
+
+
+
